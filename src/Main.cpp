@@ -1,34 +1,32 @@
 
-#include "gui/MainComponent.h"
+#include "components/MainComponent.h"
 #include <juce_gui_basics/juce_gui_basics.h>
+
+#include <memory>
 
 class Main : public juce::JUCEApplication
 {
 public:
-    //==============================================================================
-    Main() {}
+    Main() = default;
 
     const juce::String getApplicationName() override { return "YetAnotherDaw"; }
     const juce::String getApplicationVersion() override { return "0.0.1"; }
     bool moreThanOneInstanceAllowed() override { return false; }
 
-    //==============================================================================
 
     void initialise (const juce::String& commandLine) override
     {
-        mainWindow.reset (new MainWindow (getApplicationName()));
+        mainWindow = std::make_unique<MainWindow> (getApplicationName());
     }
+
     void shutdown() override { mainWindow = nullptr; }
-
-    //==============================================================================
     void systemRequestedQuit() override { quit(); }
-
     void anotherInstanceStarted (const juce::String& commandLine) override {}
 
     class MainWindow : public juce::DocumentWindow
     {
     public:
-        MainWindow (const juce::String& name)
+        explicit MainWindow (const juce::String& name)
             : DocumentWindow (name,
                 juce::Desktop::getInstance().getDefaultLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId),
                 DocumentWindow::allButtons)
@@ -37,6 +35,7 @@ public:
             setContentOwned (new MainComponent(), true);
             setResizable (true, true);
             centreWithSize (getWidth(), getHeight());
+            setBounds (0, 0, getParentMonitorArea().getWidth(), getParentMonitorArea().getHeight());
             setVisible (true);
         }
 
